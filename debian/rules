@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+# this only needs to start at boot, not at install/upgrade
+override_dh_installinit:
+	dh_installinit --no-start
+
+override_dh_install:
+	chmod 755 check_pollen
+	dh_install

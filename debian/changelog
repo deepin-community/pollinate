@@ -1,0 +1,1117 @@
+pollinate (4.33-3) unstable; urgency=medium
+
+  * upload source package
+  * add debian/watch
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Mon, 19 Aug 2019 22:20:00 +0000
+
+pollinate (4.33-2) unstable; urgency=medium
+
+  * debian/control: add salsa VCS URLs
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Thu, 28 Feb 2019 19:15:14 +0100
+
+pollinate (4.33-1) sid; urgency=medium
+
+  * first upload to Debian
+  * debian/control: use dh11
+  * debian/control: use standard 4.3.0
+  * debian/copyright: use https for copyright-format-uri
+  * debian/rules: dh 11 does not allow "--with systemd"
+  * don't use chown -r in maintainer script
+
+ -- Thorsten Alteholz <debian@alteholz.de>  Mon, 04 Feb 2019 19:15:14 +0100
+
+pollinate (4.33-0ubuntu1) cosmic; urgency=medium
+
+  * pollinate: fix bug on xen when not booted with systemd. user-agent
+    would contain virt/virt/xen rather than virt/xen. (LP: #1774043)
+  * pollinate: use systemd-detect-virt if available rather than detecting
+    its availability based on /run/systemd.
+
+ -- Scott Moser <smoser@ubuntu.com>  Tue, 29 May 2018 16:15:14 -0400
+
+pollinate (4.32-0ubuntu1) cosmic; urgency=medium
+
+  * pollinate: include img/build_name/server in user-agent.
+
+ -- Scott Moser <smoser@ubuntu.com>  Fri, 25 May 2018 12:30:06 -0400
+
+pollinate (4.31-0ubuntu1) bionic; urgency=medium
+
+  [ Scott Moser ]
+  * pollinate: add '--print-user-agent' flag.
+  * pollinate: Speedups when collecting information for user-agent.
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 14 Feb 2018 11:01:18 -0600
+
+pollinate (4.30-0ubuntu1) bionic; urgency=medium
+
+  * debian/pollinate.postinst:
+    - don't try to chown a dir to the user, potentially before the user exists
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 31 Jan 2018 07:24:33 -0600
+
+pollinate (4.29-0ubuntu1) bionic; urgency=medium
+
+  * No change rebuild, release error in 4.28
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 30 Jan 2018 16:41:13 -0600
+
+pollinate (4.28-0ubuntu1) bionic; urgency=medium
+
+  [ Dustin Kirkland ]
+  * pollinate:
+    - add hypervisor to useragent string
+  * debian/pollinate.postinst:
+    - ensure that the pollinate user owns /var/cache/pollinate;
+      to be safe, we're going to do this just after the mkdir, and
+      after the adduser;
+      this avoids the warning:
+      + adduser: Warning: The home directory /var/cache/pollinate
+        does not belong to the user you are currently creating.
+
+  [ Steve Langasek ]
+  * Minor enhancements to pollinate runtime:
+    - dpkg | awk is unnecessary, dpkg-query --showformat does this
+  * dpkg -l is a fairly heavyweight operation (.1s); ask logger directly
+    what its version number is (.01s)
+
+  [ Scott Moser ]
+  * pollinate:
+    - Add cloud image build info and data in /etc/pollinate/add-user-agent.
+    - Use systemd-detect-virt and namespace virt/<type> in useragent
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 30 Jan 2018 16:31:24 -0600
+
+pollinate (4.27-0ubuntu1) artful; urgency=medium
+
+  * Fixup maintscript & version missmatch from the previous upload.
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Fri, 18 Aug 2017 13:13:16 +0100
+
+pollinate (4.26-0ubuntu1) artful; urgency=medium
+
+  [ Scott Moser ]
+  * Perform as safe read of /proc/uptime LP: #1708461
+
+  [ Dimitri John Ledkov ]
+  * Drop upstart system job
+  * Drop no longer needed build-deps, and redundantly specified essential
+    bsdutils
+  * Fix spelling typo in the description
+  * Bump debhelper compat to 9, previous levels are deprecated
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sat, 14 Jan 2017 08:45:46 +0100
+
+pollinate (4.25-0ubuntu1) zesty; urgency=medium
+
+  [ Stefano Rivera ]
+  * debian/control: Add missing dependency on xxd. (LP: #1656484)
+
+  [ Dustin Kirkland ]
+  * debian/control: xxd is provided by vim-common in older Ubuntu releases
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sat, 14 Jan 2017 08:45:44 +0100
+
+pollinate (4.24-0ubuntu1) zesty; urgency=medium
+
+  * pollinate:
+    - remove duplicate config file sourcing
+    - add uptime/idletime to user agent to help detect abuse, LP: #1638552
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 02 Nov 2016 14:47:00 +0200
+
+pollinate (4.23-0ubuntu1) yakkety; urgency=medium
+
+  * pollinate:
+    - revert revision r300, as this was the wrong fix to the slow pollinate
+      problem;  as it turns out, it was the user_agent function, which was
+      running apt-cache very early in boot, before the apt database had
+      been created
+    - as it turns out, we need the curl timeout options in order for curl
+      to work properly and be resilient against issues with the network
+      coming up early in boot
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 30 Aug 2016 13:47:12 -0500
+
+pollinate (4.22-0ubuntu1) yakkety; urgency=medium
+
+  * debian/pollinate.default, pollinate: LP: #1604155
+    - fix a couple of bugs affecting how long pollinate takes, and if
+      it actually completes successfully
+    - dpkg -l is way faster than apt-cache, when there is no apt cache
+    - wait a maximum of 10 seconds
+    - only log to stderr if in an interactive terminal; otherwise, just
+      log to syslog
+      + this fixes the odd double-printing to /var/log/syslog
+    - optimize obtaining version strings by saving one pipe per call
+    - source /etc/lsb/release and use $DISTRIB_DESCRIPTION, rather
+      than calling lsb-release (python, can be slow)
+    - add -m (max-timeout) back to curl options;  removing this option
+      has caused network failures in various strange ways
+    - when network fails due to timeout, log accordingly
+    - ignore cloud-init package not found;  it's optional
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 29 Aug 2016 22:23:37 -0500
+
+pollinate (4.21-0ubuntu1) yakkety; urgency=medium
+
+  [ Dustin Kirkland ]
+  * pollinate:
+    - fix broken printing of binary data, this was breaking check_pollen
+      nagios scripts on the server
+
+  [ Junien Fridrick ]
+  * entropy.ubuntu.com.pem:
+    - simplify CA cert to just the DigiCert chain (drop GoDaddy)
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 22 Jul 2016 14:03:19 +0200
+
+pollinate (4.20-0ubuntu1) yakkety; urgency=medium
+
+  * debian/control:
+    - drop the anerd references, hasn't existed in basically forever
+    - update description
+    - add dummy | dh-apparmor dependency to get this building on precise,
+      where dh-systemd doesn't exist
+    - drop run-one dependency, no longer needed
+    - make the bsdutils dependency (for logger) explicit, add epoch
+  * debian/rules:
+    - use systemd, when possible
+  * pollinate:
+    - fix breakage on older (trusty, precise) Ubuntu, where logger does not
+      support --id=[ID]; check version of bsdutils (provides logger) to
+      ensure that it's at least ubuntu wily
+    - cloud-init version string
+  * debian/pollinate.service, debian/pollinate.upstart:
+    - improve the init messages logged
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 11 Jul 2016 10:52:55 -0500
+
+pollinate (4.19-0ubuntu1) yakkety; urgency=medium
+
+  [ Martin Pitt ]
+  * debian/pollinate.service: Move installation from network.target to
+    multi-user.target. network.target is too early and causes dependency loops
+    with e. g. NFS. (LP: #1576333)
+  * debian/pollinate.preinst: Clean up old enablement symlink on upgrade. This
+    needs to be kept until after 18.04 LTS.
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 19 May 2016 21:26:33 -0700
+
+pollinate (4.18-0ubuntu1) yakkety; urgency=medium
+
+  * debian/pollinate.service:
+    - move to later in boot, after network starts, but before ssh starts
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 06 May 2016 14:00:35 -0500
+
+pollinate (4.17-0ubuntu1) yakkety; urgency=medium
+
+  * debian/pollinate.service:
+    - use the right flag file for LP: #1578833
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 06 May 2016 11:36:00 -0500
+
+pollinate (4.16-0ubuntu1) yakkety; urgency=medium
+
+  [ Martin Pitt ]
+  * Don't run pollinate.service in containers (as containers can't and should
+    not write the host's random pool) and when we already have a saved random
+    seeds (i. e. only on first boot). (LP: #1578833)
+  * Bump Standards-Version to 3.9.8 (no changes needed).
+
+  [ Dustin Kirkland ]
+  * pollinate: use timeout(1) to limit curl, related to LP: #1578833
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 05 May 2016 17:12:06 -0500
+
+pollinate (4.15-0ubuntu1) xenial; urgency=medium
+
+  * pollinate: LP: #1555362
+    - log the right pid
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 09 Mar 2016 17:38:20 -0500
+
+pollinate (4.14-0ubuntu1) xenial; urgency=medium
+
+  * pollinate, pollinate.1: LP: #1554152
+    - change the failure mode of pollinate, so as to more cleanly
+      tolerate network failures
+    - add a --strict option to re-enable the previous behavior,
+      ie, strictly exit non-zero if pollinate fails for any reason
+    - we've always promised that pollinate would operate on a best-effort
+      basis, improving the prng seeding when possible, but failing
+      gracefully when not possible; as such, we've made good on the first
+      half of that promise, however, the latter half has proven
+      troublesome;  this is due to the fact that if pollinate exits
+      non-zero, then its callers (cloud-init, maas, etc.) may well
+      interpret the behavior strictly as a failure to boot the system,
+      when in fact that's not the case;  instead, we'll clearly print
+      a warning to syslog, and we'll retry the seeding on next pollinate
+      service start (e.g. a reboot);  moreover, we'll carry a --strict
+      flag in the case that users want to opt into the previous behavior
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 07 Mar 2016 15:32:49 -0600
+
+pollinate (4.13-0ubuntu1) wily; urgency=medium
+
+  [ Robie Basak ]
+  * entropy.ubuntu.com.pem:
+    - Add "DigiCert Global Root CA" certificate from ca-certificates
+      package to entropy.ubuntu.com.pem. This is required to correctly
+      verify against the new entropy.ubuntu.com SSL certificate.
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 13 Oct 2015 10:16:07 -0700
+
+pollinate (4.12-0ubuntu1) wily; urgency=medium
+
+  * pollinate:
+    - add cpu hardware model to user agent
+  * entropy.ubuntu.com.pem:
+    - entropy.ubuntu.com SSL is coming up for renewal on 2015-09-15
+    - update the certs for the pollinate package
+    - Note that this changes the issuing CA to DigiCert, which requires
+      a new intermediary.
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 11 Aug 2015 15:33:29 -0500
+
+pollinate (4.11-0ubuntu1) vivid; urgency=medium
+
+  [ Martin Pitt ]
+  * debian/pollinate.service: Avoid default dependencies as we make
+    network.target depend on pollinate, and that needs to be able to run early
+    for NFS. (LP: #1428487)
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Sat, 07 Mar 2015 19:04:31 -0500
+
+pollinate (4.10-0ubuntu1) vivid; urgency=medium
+
+  [ Martin Pitt ]
+  * Add systemd unit. Call dh_installinit with --no-start as we only need to
+    run this at boot, not at install/upgrade time.
+  * Bump Standards-Version to 3.9.6 (no changes necessary).
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 05 Dec 2014 18:02:57 -0600
+
+pollinate (4.9-0ubuntu1) utopic; urgency=medium
+
+  * entropy.ubuntu.com.pem:
+    - add original CA certificate, LP: #1381359
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 21 Oct 2014 16:07:19 -0700
+
+pollinate (4.8-0ubuntu1) utopic; urgency=medium
+
+  * entropy.ubuntu.com.pem: LP: #1381359
+    - update the expiring SSL certificate
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 15 Oct 2014 09:28:20 +0200
+
+pollinate (4.7-0ubuntu1) trusty; urgency=low
+
+  * README:
+    - update documentation;  pollinate no longer runs daily
+  * entropy.ubuntu.com.pem: LP: #1304777
+    - entropy.ubuntu.com re-keyed SSL certs due to heartbleed OpenSSL
+      vulnerability
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 09 Apr 2014 14:03:46 -0400
+
+pollinate (4.6-0ubuntu1) trusty; urgency=low
+
+  * debian/pollinate.default:
+    - move the default from POOL to SERVER
+    - this way, someone can zero out SERVER, whereas POOL is always additive
+  * pollinate:
+    - save a few forks of hostname
+  * debian/pollinate.upstart, pollinate: LP: #1286316
+    - now that cloud-init itself is calling pollinate, remove the
+      "start on starting cloud-init" trigger
+    - when running pollinate through cloud-init, we are not guaranteed
+      that syslog will be up, and smoser insists on running pollinate --quiet
+      thus we will quietly log our pollinate activity in
+      /var/cache/pollinate/log
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 07 Mar 2014 16:46:16 -0600
+
+pollinate (4.5-0ubuntu1) trusty; urgency=low
+
+  * pollinate:
+    - fix exit, when in testing mode
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 28 Feb 2014 14:12:14 -0600
+
+pollinate (4.4-0ubuntu1) trusty; urgency=low
+
+  * pollinate:
+    - relocate the testing string
+  * pollinate, pollinate.1:
+    - when testing, force the out to stdout
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 28 Feb 2014 13:56:11 -0600
+
+pollinate (4.3-0ubuntu1) trusty; urgency=low
+
+  [ JuanJo Ciarlante and Dustin Kirkland ]
+  * pollinate, pollinate.1:
+    - add a -t|--testing flag, to verify communications with a pollen
+      server; useful with the pollen nagios check
+    - can run as a non-privileged user
+    - does NOT affect the local PRNG
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 28 Feb 2014 10:43:36 -0600
+
+pollinate (4.2-0ubuntu1) trusty; urgency=low
+
+  * debian/pollinate.default:
+    - use curl --capath /dev/null by default, to mitigate SSL CA MitM
+      attacks, since we're shipping our own public cert
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 17 Feb 2014 05:52:47 -0600
+
+pollinate (4.1-0ubuntu1) trusty; urgency=low
+
+  * pollinate, pollinate.1:
+    - remove unused variable f2
+    - add support for -n|--no-challenge argument
+    - this technically makes it possible to use any arbitrary
+      URL as an entropy server
+      + e.g. random.org, news.google.com
+    - document the option in the manpage
+  * pollinate:
+    - move CURL_OPTS to the end of the line, so that the admin can override
+      any curl option, such as the user-agent string in /etc/default/pollinate
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 11 Feb 2014 18:05:53 -0600
+
+pollinate (4.0-0ubuntu1) trusty; urgency=low
+
+  * ChangeLog, check_pollen, COPYING, debian/control, debian/copyright,
+    debian/pollen.default, debian/pollen.install,
+    debian/pollen.manpages, debian/pollen.postinst,
+    debian/pollen.postrm, debian/pollen.upstart, debian/rules,
+    img/pollen_14.png, img/pollen_192.png, img/pollen_64.png,
+    img/pollinate_14.png, img/pollinate_192.png, img/pollinate_64.png,
+    img/pollinate.png, INSTALL, Makefile, pollen.8, pollen.go,
+    usr.bin.pollen:
+    - split pollinate out into its own project and source package
+    - pollinate is a simple shell script, whereas pollen is a compiled
+      golang binary; this was proving far too complex to manage together
+  * debian/pollinate.postinst, debian/pollinate.preinst: LP: #1278770
+    - clean up busted/broken conffile, oops
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 11 Feb 2014 09:43:23 -0600
+
+pollen (3.17-0ubuntu1) trusty; urgency=low
+
+  * pollinate:
+    - improve kernel debug info
+  * debian/control, debian/pollen.install, Makefile:
+    - TEMPORARILY disabling the building of pollen, until
+      either gccgo or golang-go get promoted to main
+    - this should be reverted as soon as a go compiler
+      is available as a build dep
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 10 Feb 2014 14:16:08 -0600
+
+pollen (3.16-0ubuntu1) trusty; urgency=low
+
+  * pollinate:
+    - minor standardization of the user agent string
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 05 Feb 2014 13:57:42 +0200
+
+pollen (3.15-0ubuntu1) trusty; urgency=low
+
+  * debian/control: LP: #1274074
+    - build on any architecure, now that we build with gccgo
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 05 Feb 2014 12:31:20 +0200
+
+pollen (3.14-0ubuntu1) trusty; urgency=low
+
+  * debian/pollinate.postinst:
+    - fix order of operations, packaging breakage
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 05 Feb 2014 11:34:36 +0200
+
+pollen (3.13-0ubuntu1) trusty; urgency=low
+
+  * README:
+    - fix more minor typos
+    - explain "did some work"
+  * debian/rules, Makefile:
+    - fix the build for gccgo
+    - must use the -g parameter
+    - don't strip binaries
+    - these are ugly, but are the result of gccgo vs golang-go
+  * pollinate:
+    - remove unused variable $cmd
+  * debian/pollinate.upstart:
+    - our upstart job should start on starting cloud-init, to ensure that
+      we get run before generating SSH keys
+  * debian/pollinate.install, debian/pollinate.postrm, pollen.go,
+    pollinate, pollinate.cron.d, README:
+    - drop the tag and cronjob per feedback from sarnold in the code audit
+      in LP: #1246098
+  * debian/pollinate.default, pollinate:
+    - add helpful debug info to user agent, similar to chrome and firefox,
+  * debian/pollinate.postinst, debian/pollinate.postrm,
+    debian/pollinate.upstart, pollinate, pollinate.1:
+    - use a pollinate user, rather than the daemon user
+    - by default, only run pollinate once per system instantiation
+    - offer reseeding as an option, though
+  * debian/control:
+    - need to depend on adduser
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 04 Feb 2014 11:51:22 +0200
+
+pollen (3.12-0ubuntu1) trusty; urgency=low
+
+  * README:
+    - minor documentation feedback from Kees Cook
+    - note that pollen servers can of course be run internally
+  * debian/control:
+    - clean up package descriptions a bit
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 28 Jan 2014 22:16:10 +0000
+
+pollen (3.11-0ubuntu1) trusty; urgency=low
+
+  * README:
+    - updates to the README
+  * debian/copyright, pollinate:
+    - the client should really be GPLv3, rather than AGPL
+  * debian/copyright:
+    - point to the local copy of GPLv3 license
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 27 Jan 2014 13:54:16 +0000
+
+pollen (3.10-0ubuntu1) trusty; urgency=low
+
+  * debian/pollinate.cron.d, debian/pollinate.postinst, pollinate:
+    - have each client choose a random time of day to reseed,
+      at first run, rather than at package installation time
+    - this requires a very clever hack(!)
+    - install a "template" at /etc/cron.d/pollinate, with __MINUTE__
+      and __HOUR__ symbols that should be replaced by the client,
+      at first run
+    - cron requires that /etc/cron.d/pollinate be owned by root
+    - ideally we'd run the pollinate script as a non-root user (ie, daemon),
+      by specifying the daemon user in upstart and in the cronjob
+    - but daemon can't write to /etc/cron.d/pollinate, if it's owned by root
+    - so here's the hack...
+      + the upstart job installed by the package has "setuid root"
+      + on its first run (which will be either at package install time, or
+        at boot), it will run as root and: a) update the cronjob to a random
+        time, and b) update the upstart job to run as daemon
+      + woot
+      + this works because both are conffiles
+  * debian/pollen.postinst, debian/pollinate.postinst,
+    debian/pollinate.postrm, pollinate:
+    - use /var/cache/pollinate, rather than /var/lib/pollinate
+    - this should make it more obvious that this data can be cleared out,
+      and should be cleared out, on re-bundles or snapshots and reimages
+  * debian/control, Makefile:
+    - switch from golang-go to gcc-go, so that we can get this source
+      package into Ubuntu main
+  * pollinate, pollinate.1:
+    - separate the pool and the server variables
+  * debian/control:
+    - no need to depend on bsdutils, it's essential
+    - pollen depends on adduser
+  * usr.bin.pollen:
+    - update apparmor profile to allow reading of /usr/bin/pollen
+      - oddly, this was introduced when switching compilers
+  * debian/copyright:
+    - lintian/dep5 cleanup
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 16 Jan 2014 11:39:42 -0600
+
+pollen (3.9-0ubuntu1) trusty; urgency=low
+
+  * debian/pollinate.default:
+    - don't use quiet by default, do use binary
+  * pollinate:
+    - save ourselves an unneeded fork
+  * debian/control:
+    - drop haveged as a suggests
+  * debian/pollinate.default, debian/pollinate.install,
+    entropy.ubuntu.com.pem:
+    - install entropy.ubuntu.com.pem's certificate and intermediate
+      chain, to get rid of --insecure curl option
+  * debian/control, pollinate:
+    - log to the system log, using the logger utility
+    - add a final message, noting successful (re-)seed
+    - have pollinate depend on bsdutils, which provides logger
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 16 Jan 2014 08:01:28 -0600
+
+pollen (3.8-0ubuntu1) trusty; urgency=low
+
+  * debian/pollinate.default, debian/pollinate.postinst,
+    debian/pollinate.upstart, pollinate:
+    - fix the (broken) options setting in the pollinate default file
+    - change the tag creation to happen during the pollinate runtime,
+      rather than at package installation; this makes it more useful
+      for downstreams and remixes of Ubuntu
+    - ensure the daemon user owns the /var/lib/pollinate directory
+    - run the pollinate upstart script as the daemon user
+  * debian/pollinate.cron.d, debian/pollinate.postinst,
+    debian/pollinate.postrm:
+    - run the pollinate cronjob (reseed) once per day, rather than once
+      per hour
+    - purge pollinate files more effectively
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 15 Jan 2014 16:49:35 -0600
+
+pollen (3.7-0ubuntu1) trusty; urgency=low
+
+  * debian/control:
+    - demote haveged to suggests, based on feedback from Seth Arnold
+      in LP: #1246098
+  * pollinate:
+    - ensure both -c and -i can be used, without losing CURL_OPTS,
+      as identified by Seth Arnold in LP: #1246098
+  * pollinate:
+    - drop unused IPV6 variable, per review by Seth Arnold in LP: #1246098
+  * debian/pollen.postinst:
+    - use pollen as our fake email address, suggested by Seth Arnold
+      in LP: #1246098
+  * debian/pollinate.cron.d:
+    - add notes in the comments about NIST DRBG Special Publication 800-90A
+      recommendations on reseeding
+    - add notes in the comments about why we choose a random minute
+    - fix a bug, that was causing the cronjob to run far more frequently
+      than desired
+    - Addresses some issues raised by Seth Arnold in LP: #1246098
+  * debian/pollen.upstart, pollen.8, pollen.go:
+    - add DEVICE as the 3rd argument to the pollen server in the upstart
+      script
+    - test that DEVICE is a special in upstart
+    - document that the DEVICE is now a required argument
+  * debian/pollen.install, Makefile, pollen:
+    - build static binary at package build time, rather than dynamically
+      compiling at each run, per feedback from Seth Arnold in LP: #1246098
+    - use a very simple, basic Makefile
+  * debian/control:
+    - move golang-go to a build-dependency, rather than a runtime dependency
+  * debian/control, debian/pollen.postinst, debian/pollen.postrm,
+    debian/pollen.upstart:
+    - create a new user, pollen:daemon, in the postinst, remove in postrm
+    - depend on libcap2-bin, which provides setcap
+    - use setcap to allow the pollen binary to bind to privileged ports
+    - run the pollen daemon as the pollen user
+    - per feedback from Seth Arnold in LP: #1246098
+  * debian/pollen.upstart:
+    - use setuid in upstart to run the pollen daemon as the pollen user
+  * debian/pollen.postinst:
+    - change pollen user's shell to /bin/false
+  * debian/control, debian/pollen.install, debian/pollen.postinst,
+    debian/rules, usr.bin.pollen:
+    - add an apparmor profile for the pollen server, per suggestion
+      by Seth Arnold in LP: #1246098
+    - big thanks to Jamie Strandboge and Seth Arnold for assistance
+  * debian/pollinate.postinst:
+    - these chowns are not necessary; thanks for catching Michael Terry
+      in LP: #1246098
+  * debian/control: LP: #1259014
+    - have the pollen server depend on ent, which is used by the
+      check_pollen nagios script
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 15 Jan 2014 10:59:34 -0600
+
+pollen (3.6-0ubuntu1) trusty; urgency=low
+
+  * pollinate:
+    - remove sourcing of an rc config file from $HOME, per security
+      review from Seth Arnold
+  * pollinate.1:
+    - update documentation to note that multiple servers can be specified
+      on the command line
+  * debian/pollinate.default:
+    - use the entropy.ubuntu.com beta site for testing
+    - note that we're specifying the --insecure option here, as this is
+      very much a work in progress
+  * debian/pollinate.upstart:
+    - start pollinate when we have networking up and running, or
+      when we start ssh
+  * pollen.go:
+    - drop the nanosecond timestamp collection on the server
+    - a good server should have real entropy hardware, and a busy server
+      will have network traffic entropy already captured by the kernel
+    - Suggestion by Seth Arnold in a security review
+  * debian/pollen.default, pollinate:
+    - drop timestamp based salting, not terribly valuable
+    - per security review by Seth Arnold
+  * pollinate:
+    - drop unused $bin variable
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 08 Nov 2013 09:59:35 -0600
+
+pollen (3.5-0ubuntu1) trusty; urgency=low
+
+  * README:
+    - enhance and update design documentation
+  * debian/copyright:
+    - update to DEP-5 format
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 29 Oct 2013 16:55:28 -0500
+
+pollen (3.4-0ubuntu1) saucy; urgency=low
+
+  * check_pollen, debian/control:
+    - improve the nagios check
+    - warn if:
+      + insufficient bytes are retrieved
+      + less than 5-bits-per-byte of entropy are calculated
+      + an out of whack arithmetic mean
+    - have pollen server recommend ent, which is used by the nagios check
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 11 Sep 2013 16:56:52 -0500
+
+pollen (3.3-0ubuntu1) saucy; urgency=low
+
+  * pollen-nagios-check:
+    - added nagios check script
+  * check_pollen, debian/pollen.install:
+    - rename check script and install in nagios plugins directory
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 04 Sep 2013 14:25:49 -0500
+
+pollen (3.2-0ubuntu1) saucy; urgency=low
+
+  * README:
+    - update design documentation
+  * pollinate, pollinate.1:
+    - support printing random seed to standard out
+    - useful for debugging
+    - add a -q|--quiet option to silence log messages
+  * pollinate, pollinate.1:
+    - add an option for binary data output
+  * debian/pollen.default, debian/pollen.upstart, pollen.8, pollen.go:
+    - re-enable support for both encrypted and non-encrypted connections
+    - use a go subroutine to serve both out of the same process
+    - document these changes
+    - default to 80 and 443, allow admin to override easily via config
+  * debian/control:
+    - update package descriptions
+  * pollinate:
+    - default to, but do not force, https
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 20 Aug 2013 18:56:11 -0500
+
+pollen (3.1-0ubuntu1) saucy; urgency=low
+
+  * pollen.go
+    - use a global for the dev writer
+    - write a few more timestamps into the mix during the response
+      handler
+    - change logging verbiage
+  * pollinate:
+    - use a single temp directory, rather than multiple temp files
+    - use a trap to cleanup the temp directory
+    - uptdate the logging verbiage
+    - use an etc default file if available
+  * debian/pollen.default:
+    - drop "TCP_" in the TCP_PORT variable
+  * pollen.go:
+    - just use two timestamps
+  * pollinate:
+    - improve usability; prepend https
+  * debian/pollinate.cron.d, debian/pollinate.default,
+    debian/pollinate.upstart, pollinate, pollinate.1:
+    - use an upstart job, rather than an @reboot cronjob,
+      to do the initial prng seeding
+    - fix the default config file
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Wed, 14 Aug 2013 17:45:22 -0500
+
+pollen (3.0-0ubuntu1) saucy; urgency=low
+
+  * anerd, anerd-server-tcp.1 => anerd-server.1, anerd-server-tcp =>
+    anerd-server, anerd-server-tcp.go => anerd-server.go, anerd-server-
+    udp.1, anerd-server-udp.c, configure.ac, debian/anerd-
+    client.default, debian/anerd-server.anerd-server-tcp.upstart =>
+    debian/anerd-server.upstart, debian/anerd-server.anerd-server-
+    udp.upstart, debian/anerd-server.default, debian/anerd-
+    server.install, debian/anerd-server.manpages, debian/control,
+    debian/rules, Makefile.am:
+    - completely deprecate the UDP operation of both the client and
+      the server
+    - the TLS server over TCP is the only supported protocol going
+      forward
+    - this will necessitate a major version bump
+  * anerd.1 => pollinate.1, anerd => pollinate, anerd-server.1 =>
+    pollen.8, anerd-server.go => pollen.go, anerd-server => pollen,
+    ChangeLog, debian/anerd-client.cron.d => debian/pollinate.cron.d,
+    debian/anerd-client.default => debian/pollinate.default,
+    debian/anerd-client.install => debian/pollinate.install,
+    debian/anerd-client.manpages => debian/pollinate.manpages,
+    debian/anerd-client.postinst => debian/pollinate.postinst,
+    debian/anerd-client.postrm => debian/pollinate.postrm, debian/anerd-
+    server.default => debian/pollen.default, debian/anerd-server.install
+    => debian/pollen.install, debian/anerd-server.manpages =>
+    debian/pollen.manpages, debian/anerd-server.postinst =>
+    debian/pollen.postinst, debian/anerd-server.upstart =>
+    debian/pollen.upstart, debian/control, debian/copyright,
+    img/anerd_14.png, img/anerd_192.png, img/anerd_64.png,
+    img/anerd.png, initramfs/hooks/anerd-client-udp,
+    initramfs/scripts/init-bottom/anerd, NEWS, README, === removed
+    directory initramfs, === removed directory initramfs/hooks, ===
+    removed directory initramfs/scripts, === removed directory
+    initramfs/scripts/init-bottom:
+    - rename anerd server/client to pollen / pollinate
+      to reflect that this data is intended to "seed" a random
+      number generator
+  * debian/control, debian/pollen.manpages:
+    - package maintenace for package/project rename
+    - move manpage to section 8
+  * pollen.8, pollinate, pollinate.1:
+    - documentation updated
+  * debian/control, pollen.8, pollinate:
+    - update some documentation and descriptions
+  * img/pollen_14.png, img/pollen_192.png, img/pollen_64.png:
+    - added new pollen logos
+  * debian/control:
+    - drop suggests
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 13 Aug 2013 16:34:42 -0500
+
+anerd (2.4-0ubuntu1) saucy; urgency=low
+
+  * anerd-client-tcp.go:
+    - deprecated, use the shell (curl) one for better timestamping
+      salt
+  * anerd-server-tcp.go:
+    - log user-agent and nanosecond timestamp
+  * anerd, anerd-server-tcp.go:
+    - rename "tip" to "challenge", use for challenge/response
+    - verify challenge/response, to ensure personalized communication
+  * anerd:
+    - use a common logging function throughout
+  * anerd-server-tcp.go:
+    - open syslog only once
+  * anerd, debian/control:
+    - lower socat to a suggests, while still requiring curl
+    - dynamically check for socat/curl and error appropriately
+    - update package description
+    - recommend haveged on the server
+  * debian/anerd-server.default:
+    - do not run the UDP, by default; local admin can enable by
+      setting a port in /etc/default/anerd-server
+  * anerd, anerd-server-tcp.go, debian/anerd-client.postinst,
+    debian/anerd-server.postrm:
+    - rename uuid to tag
+    - generate on package install, remove on purge
+  * anerd, debian/anerd-server.postrm => debian/anerd-client.postrm:
+    - silence search for helper utilities
+    - fix maintainer script name
+  * anerd:
+    - silence missing tag error messages for now
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 09 Aug 2013 16:16:54 +0100
+
+anerd (2.3-0ubuntu1) saucy; urgency=low
+
+  [ Matthias Klose ]
+  * debian/control: LP: #1139188
+    - Don't build anerd-server on powerpc (no golang-go, prevents
+      migration from raring-proposed to raring).
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 02 Aug 2013 12:40:00 -0500
+
+anerd (2.2-0ubuntu1) saucy; urgency=low
+
+  * === added directory img, img/anerd_14.png, img/anerd_192.png,
+    img/anerd_64.png, img/anerd.png:
+    - added icons
+  * anerd-server-tcp.go:
+    - gofmt
+  * anerd-server-tcp.go:
+    - make this code more go-like, after some code review with Tim Penney
+  * anerd-server-tcp.go:
+    - drop unnecessary json formatting
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 01 Aug 2013 09:21:13 -0500
+
+anerd (2.1-0ubuntu1) saucy; urgency=low
+
+  * anerd-client-tcp.go:
+    - default to anerd.us
+  * anerd, anerd-client-tcp.go, anerd-server-tcp.go, debian/anerd-
+    client.default:
+    - anerd.us is now serving on 443
+  * anerd, anerd-server-tcp.go:
+    - add syslog logging to the anerd tcp server
+    - use post for the tip from the anerd tcp client
+  * anerd, debian/control:
+    - use uuidgen -r for uuid and tip
+  * anerd, anerd-server-udp.c:
+    - add UDP to syslog messages
+    - fix uuid related typo
+    - add --insecure option
+  * anerd, anerd-client-tcp.go, anerd-server-tcp.go, debian/control:
+    - use sha512sum rather than uuidgen
+  * anerd, debian/anerd-client.cron.d:
+    - run at reboot, and hourly thereafter
+    - shorten some function names
+  * debian/anerd-client.cron.d, debian/anerd-client.postinst:
+    - randomize the hourly cronjob to distribute load on the
+      server, if possible
+  * debian/control:
+    - fix a lintian annoyance
+  * anerd, anerd-server-tcp.go, anerd-server-udp.c:
+    - drop byte counts in logging, as these can be misleading
+  * anerd-server-tcp.go:
+    - salt data with nanosecond timestamp
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Mon, 29 Jul 2013 15:24:29 -0500
+
+anerd (2.0-0ubuntu1) saucy; urgency=low
+
+  * anerd-tcp.go:
+    - pretty print the json
+  * anerd-client, anerd-client.1, anerd-tcp, anerd-tcp.1, anerd-tcp.go,
+    anerd-udp.1, anerd-udp.c, debian/anerd-server.anerd-tcp.upstart,
+    debian/anerd-server.anerd-udp.upstart, debian/control:
+    - drop the "asynchronous" part of aNerd, this really isn't
+      necessary in the description anymore
+  * anerd-tcp.go:
+    - reduce the default size to 64 bytes, which is sufficient to seed
+      any random number generator
+  * anerd-tcp.go, debian/anerd-server.default:
+    - change the default size to 64 bytes
+    - add some notes in the comments in the configuration file
+    - always uses TLS encryption for the TCP implementation
+  * anerd-tcp.1 => anerd-server-tcp.1, anerd-tcp => anerd-server-tcp,
+    anerd-tcp.go => anerd-server-tcp.go, anerd-udp.1 => anerd-server-
+    udp.1, anerd-udp.c => anerd-server-udp.c, debian/anerd-server.anerd-
+    tcp.upstart => debian/anerd-server.anerd-server-tcp.upstart,
+    debian/anerd-server.anerd-udp.upstart => debian/anerd-server.anerd-
+    server-udp.upstart, debian/anerd-server.install, debian/anerd-
+    server.manpages, debian/rules, Makefile.am:
+    - rename anerd-tcp to anerd-server-tcp
+    - rename anerd-udp to anerd-server-udp
+  * debian/anerd-client.default:
+    - change to the new anerd.us server, which supports TCP, TLS, and UDP
+  * anerd, anerd-client, anerd-client.1 => anerd.1, anerd-client-tcp.go,
+    anerd-server-tcp, debian/anerd-client.cron.d, debian/anerd-
+    client.default, debian/anerd-client.install, debian/anerd-
+    client.manpages, debian/anerd-server.anerd-server-tcp.upstart,
+    debian/anerd-server.install, debian/control, initramfs/hooks/anerd-
+    client => initramfs/hooks/anerd-client-udp, initramfs/scripts/init-
+    bottom/anerd-client => initramfs/scripts/init-bottom/anerd,
+    Makefile.am:
+    - major rework of client, combine udp/tcp clients into a single
+      shell script
+  * anerd, anerd-client-tcp.go, anerd-server-tcp, anerd-server-tcp.go,
+    anerd-server-udp.c, COPYING, debian/copyright,
+    initramfs/scripts/init-bottom/anerd:
+    - changed license back to AGPL
+  * debian/anerd-client.default, debian/anerd-server.default:
+    - deprecate hash as a configurable; use sha512sum
+  * anerd:
+    - use socat in verbose mode, to add more timestamps to the log
+    - hash the timestamped log output
+  * debian/control:
+    - bump standards
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 25 Jul 2013 16:34:54 -0500
+
+anerd (1.4-0ubuntu1) raring; urgency=low
+
+  [ Dustin Kirkland ]
+  * anerd-tcp.go:
+    - add a very small, basic anerd-tcp server
+    - clean up via gofmt
+  * anerd-client:
+    - count the number of bytes received correctly using a tmpfile
+    - adjust info messages slightly
+  * anerd.c:
+    - drop crc from logging, change messages to info from debug
+  * debian/anerd-client.default:
+    - default to anerd.gazzang.net now that its up for good
+  * anerd-tcp, anerd-tcp.go, debian/anerd-tcp-common.install,
+    debian/anerd-tcp.postinst, debian/anerd-tcp.upstart, debian/anerd-
+    web.upstart, debian/control:
+    - create two small packages, one to launch anerd-tcp->80 and
+      anerd-tcp->443
+      + both depend on anerd-tcp-common, which provides the go script
+    - add a postinst that generates a self-signed cert if there is none;
+      obviously, one would want to replace these with real certs if
+      security matters to you
+    - create two upstart scripts that start the web service on each port
+      + means you can install one, or the other, or both
+  * anerd-client, debian/anerd-client.default:
+    - fix communication with remote servers
+    - make the wait time configurable, 0.1s by default
+    - only broadcast when no specific servers are specified
+    - add message on broadcast bytes sent
+  * anerd-tcp:
+    - add interpreter
+  * anerd-tcp.1, debian/anerd-tcp-common.manpages:
+    - add documentation
+  * anerd-tcp.go:
+    - ensure that we read enough bytes
+  * anerd.1 => anerd-udp.1, anerd.c => anerd-udp.c, anerd-web.1 =>
+    anerd-tcp.1, anerd-web => anerd-tcp, anerd-web.go => anerd-tcp.go,
+    debian/anerd-server.anerd-udp.upstart, debian/anerd-server.default,
+    debian/anerd-server.install, debian/anerd-server.manpages,
+    debian/anerd-server.upstart => debian/anerd-server.anerd-
+    tcp.upstart, debian/anerd-web-common.install, debian/anerd-web-
+    common.manpages, debian/anerd-webs.postinst => debian/anerd-
+    server.postinst, debian/anerd-webs.upstart, debian/anerd-
+    web.upstart, debian/control, debian/rules, Makefile.am:
+    - rename the C program to anerd-udp
+    - create separate upstart scripts for anerd-tcp and anerd-udp
+    - update documentation
+    - drop anerd-web* packages
+  * debian/anerd-client.postinst, debian/control, debian/anerd-client.install:
+    - keep the initramfs code, but don't automatically update the initramfs
+      for now, as this can render a machine without networking unbootable;
+      re-enable this when we have a workaround for that
+  * debian/anerd-server.postinst:
+    - fix typo
+
+  [ Hector Acosta ]
+  * anerd.c:
+    - Only call srandom() once
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Fri, 15 Feb 2013 13:02:50 -0600
+
+anerd (1.3-0ubuntu1) raring; urgency=low
+
+  * anerd.1, anerd.c, anerd-client, anerd-client.1, AUTHORS,
+    debian/anerd-server.upstart, debian/copyright:
+    - updated email addresses and author information
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 05 Feb 2013 09:50:23 -0600
+
+anerd (1.2-0ubuntu1) raring; urgency=low
+
+  [ Dustin Kirkland ]
+  * debian/control, debian/cron.d:
+    - use run-one for cronjob
+  * anerd-client:
+    - clean up client, make more modular, remove some variables, uses pipes
+      to keep everything in memory
+  * debian/anerd-client.install, debian/anerd-server.install,
+    debian/control, debian/copyright, debian/cron.d => debian/anerd-
+    client.cron.d, debian/default => debian/anerd-client.default,
+    debian/upstart => debian/anerd-server.upstart:
+    - split package into a server and client package, with a meta
+      package depending on both
+  * anerd.1, anerd-client.1:
+    - manpage fixes
+  * debian/anerd-client.cron.d, debian/anerd-client.default:
+    - add some inline documentation
+    - use the default file for setting defaults (ie, uncomment)
+  * debian/control:
+    - bump standards
+  * debian/anerd-server.manpages, debian/manpages => debian/anerd-
+    client.manpages, Makefile.am:
+    - install manpages (perhaps there's a better automake way of doing this?)
+  * anerd.c:
+    - rename "sum" to "crc"
+  * debian/anerd-server.upstart:
+    - upstart needs to expect the fork
+    - upstart does not need to sudo to the daemon user because anerd does
+      this automatically
+  * anerd-client:
+    - use a $cmd variable populated with correct parameters
+  * anerd-client, debian/control:
+    - reluctantly add support for netcat
+  * anerd-client, anerd-client.1:
+    - use a default file for configuration
+  * anerd-client:
+    - emulate the syslog printing from the server
+
+  [ Wesley Wiedenmeier ]
+  * anerd.c, anerd-client, debian/default:
+    - add ipv6 support
+  * anerd.1, anerd.c, anerd-client.1, debian/manpages:
+    - added manpages
+    - dropped unused global
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 22 Jan 2013 10:38:24 -0600
+
+anerd (1.1-0ubuntu1) quantal; urgency=low
+
+  * anerd.c:
+    - define the default total exchange size
+    - also define and use a default payload size
+    - break up the total exchange to a bunch of smaller payloads, to increase
+      the randomness of UDP packet ordering and timing
+    - improve some inline documentation
+    - lower logging to debug from info
+    - allocate an extra byte for the data binary string
+    - use a separate pointer for segmenting and moving through the data string
+    - no need for null-bytes, since binary data could have null bytes within
+    - alphabetize includes
+    - change perrors to syslog errors
+    - move daemon() function
+  * Makefile.am:
+    - fix up the build, clean out the binary and log files
+  * anerd.c, anerd-client, debian/control, debian/cron.d,
+    debian/default, debian/install, Makefile.am:
+    - drop the anerd client in the C program entirely
+    - the C program is now the server exclusively
+    - add a bash script client, which can loop over a pool of anerd servers,
+      and broadcast to the local network
+    - recommend the socat package/utility, which is used to broadcast to the
+      local network from the bash script
+    - add a cron job to run the anerd-client regularly
+    - add a default configuration file for configuring the pool and other
+      tunables
+    - remove the unnessary install file
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Thu, 27 Sep 2012 15:40:23 -0500
+
+anerd (1.0-0ubuntu1) quantal; urgency=low
+
+  [ Dustin Kirkland ]
+  * initial release
+  * === added directory debian, === added directory debian/source,
+    anerd, debian/compat, debian/control, debian/copyright,
+    debian/install, debian/rules, debian/source/format, debian/upstart:
+    - added packaging
+  * anerd, anerd.conf, debian/install, debian/upstart:
+    - add a configuration file
+    - run as daemon (non-root) user
+  * anerd.c, AUTHORS, ChangeLog, configure.ac, COPYING,
+    debian/copyright, debian/upstart, INSTALL, Makefile.am, NEWS,
+    README:
+    - ported from python to C
+    - added autoconf/automake build
+    - changed license from GPLv3 to Apache2.0 for portability to other
+      UNIX platforms
+  * anerd.conf, debian/control, debian/install, debian/upstart:
+    - drop conf file, add options to upstart script
+    - update build deps
+  * anerd.c:
+    - use syslog, open files/sockets only once per fork
+    - catch all responses to a client broadcast
+    - use a common function for salt calculation
+    - implement a very simple checksum of random data
+    - use uint64_t for platform compatibility
+    - add entropy to pool in client read
+    - simplify salt generation
+    - simplify log printing
+    - whitespace changes only, 80 char width
+  * debian/install:
+    - drop installation of default file
+
+  [ Wesley Wiedenmeier ]
+  * anerd.c:
+    - use getopt for command line parsing
+    - Modified code to fork twice then kill the parent process,
+      freeing the terminal that spawns the daemons, added daemonize()
+      function to safely daemonize the program.
+    - Improved entering into daemon status by moving daemon() call to
+      after intilization of server and client, so that errors
+      encountered in intilization are written to the terminal.
+
+ -- Dustin Kirkland <kirkland@ubuntu.com>  Tue, 04 Sep 2012 18:14:40 -0500

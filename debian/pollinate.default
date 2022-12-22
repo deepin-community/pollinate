@@ -1,0 +1,13 @@
+# These the options that are used by pollinate(1) by default.
+# Note that any option here can be overriden on the command line
+# at invocation time.  Please see pollinate(1) for documentation.
+BINARY=1
+QUIET=0
+WAIT=10
+DEVICE="/dev/urandom"
+#
+# plese use this SERVER only for testing 
+#SERVER="https://pollen.debian.alteholz.net/"
+SERVER="https://pollen.example.com/"
+POOL=""
+CURL_OPTS=""

@@ -1,0 +1,15 @@
+Description: in Debian there is no /etc/lsb-release
+Author: Thorsten Alteholz <debian@alteholz.de>
+Index: pollinate-4.33/pollinate
+===================================================================
+--- pollinate-4.33.orig/pollinate	2018-05-29 22:13:20.000000000 +0200
++++ pollinate-4.33/pollinate	2019-02-06 16:12:12.298990019 +0100
+@@ -187,7 +187,7 @@
+ 	# Construct a user agent, with useful debug information
+ 	# Very similar to Firefox and Chrome
+ 	
+-	. /etc/lsb-release
++	DISTRIB_DESCRIPTION="Debian `cat /etc/debian_version`"
+ 
+ 	local pkg_info="" lsb="" platform="" cpu="" up="NA" idle="NA" uptime
+ 	read_package_versions && pkg_info="$_RET"

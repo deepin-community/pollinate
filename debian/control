@@ -1,0 +1,22 @@
+Source: pollinate
+Section: admin
+Priority: optional
+Maintainer: Thorsten Alteholz <debian@alteholz.de>
+Build-Depends: debhelper (>= 11)
+Standards-Version: 4.3.0
+Homepage: http://launchpad.net/pollinate
+Vcs-Browser: https://salsa.debian.org/alteholz/pollinate
+Vcs-Git: https://salsa.debian.org/alteholz/pollinate.git
+
+Package: pollinate
+Architecture: all
+Depends: ${misc:Depends}, curl, adduser, xxd | vim-common
+Description: seed the pseudo random number generator
+ This client will connect to one or more Pollen (entropy-as-a-service)
+ servers over an (optionally) encrypted connection and retrieve a random
+ seed over HTTP or HTTPS.
+ This is particularly useful at the first boot of cloud images and in
+ virtual machines, to seed a system's random number generator at
+ genesis, and is intended to supplement the /etc/init.d/urandom init script.
+ It can be used on physical machines, as well, to supplement the seeding
+ of the pseudo random number generator.

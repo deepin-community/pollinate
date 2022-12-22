@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+PKG="pollinate"
+
+# Create the user if necessary
+if ! getent passwd $PKG >/dev/null; then
+	adduser --disabled-password --quiet --system --home /var/cache/$PKG --ingroup daemon --shell /bin/false $PKG
+fi
+mkdir -p /var/cache/$PKG
+chown -f $PKG /var/cache/$PKG
+rm -f /var/cache/$PKG/tag
+
+
+#DEBHELPER#

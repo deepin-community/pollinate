@@ -1,0 +1,3 @@
+version=3
+https://launchpad.net/pollinate/ \
+  https://launchpad.net/.*/pollinate_(.*)\.orig\.tar\.gz
